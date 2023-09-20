@@ -6,13 +6,12 @@ def print_something(something: Optional[str]) -> None:
 
 
 def main():
-    print_something("Veritas vos liberabit.")
-    print_something(None)
+    print_something("Welcome to ingeSTation project!")
 
 
-def py_project_template():
+def ingestation():
     return main()
 
 
 if __name__ == "__main__":
-    py_project_template()
+    ingestation()
