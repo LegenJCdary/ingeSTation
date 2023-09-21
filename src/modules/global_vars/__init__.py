@@ -1,4 +1,5 @@
 APPLICATION_DIR = "/etc/ingestation"
+APPLICATION_CONF = "/etc/ingestation/ingestation.json"
 
 CONFIG_RULES = {
     "containers_sata_device_path": {
