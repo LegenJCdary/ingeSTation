@@ -1,0 +1,17 @@
+{
+    "type": "array",
+    "minItems": 0,
+    "uniqueItems": false,
+    "items": {
+        "oneOf": [
+            {
+                "type": "integer",
+                "minimum": 3
+            },
+            {
+                "type": "string",
+                "minLength": 3
+            }
+        ]
+    }
+}
