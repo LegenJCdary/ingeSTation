@@ -14,7 +14,7 @@ class InitParams:
 
     @staticmethod
     def get_start_point() -> str:
-        return datetime.now().strftime("%Y%m%d_%H%M%S")
+        return datetime.now()
 
     @staticmethod
     def get_caller_id() -> Tuple[int, int, str]:
