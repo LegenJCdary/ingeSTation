@@ -1,5 +1,6 @@
 from ingestation.modules.misc.arguments import CliInput
 from ingestation.modules.misc.utils import InitParams
+from ingestation.modules.outputs.loggers import Loggers
 
 
 def main(cli_options: dict) -> None:
@@ -11,6 +12,8 @@ def main(cli_options: dict) -> None:
     print("Welcome to ingeSTation project!")
     print(f"Started with: {print_params}")
     print(f"Supplied options: {print_options}")
+    loggers = Loggers(cli_options)
+    logger = loggers.logger
 
 
 def ingestation():
