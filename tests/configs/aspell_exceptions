@@ -7,6 +7,7 @@ arg
 argparse
 args
 ArgumentParser
+asctime
 asdict
 async
 attr
@@ -20,6 +21,7 @@ classmethod
 cli
 CliInput
 cls
+ColourFormatter
 config
 configs
 const
@@ -46,6 +48,8 @@ Filesystems
 fixme
 FIXME
 fmt
+formatter
+Formatter
 fullmatch
 getattr
 gethostname
@@ -69,6 +73,7 @@ ixin
 json
 Kuba
 LegenJCdary
+levelname
 LF
 liberabit
 lintTesting
@@ -117,6 +122,7 @@ rgx
 rgxs
 rsync
 runtime
+sed
 setuptools
 src
 startswith
@@ -124,6 +130,7 @@ staticmethod
 stdin
 stmt
 str
+StreamHandler
 sublicense
 subtree
 sudo
