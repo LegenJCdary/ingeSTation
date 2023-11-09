@@ -1,0 +1,18 @@
+{
+  "destination_options": {
+    "preserve": true,
+    "preserve_level": 1,
+    "enforce_structure": {
+      "file_pattern": "",
+      "destination_pattern": ""
+    }
+  },
+  "workdir": "/users/my_logs/${date}.log",
+  "notify": {
+    "HPC_upload": "upload_support@ingestation.com"
+  },
+  "exclude_devices": [
+    "DISKSN02"
+  ],
+  "include_devices": []
+}

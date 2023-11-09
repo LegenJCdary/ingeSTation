@@ -1,0 +1,17 @@
+{
+  "containers": {
+    "sata": {
+      "device_path": "/dev",
+      "mount_path": "/mnt"
+    }
+  },
+  "syslog": false,
+  "workdir": "/var/log/ingestation",
+  "naming": {
+    "log_file": "",
+    "codename": ""
+  },
+  "notify": {
+    "zh23": "zh23@ingestation.com"
+  }
+}
