@@ -1,0 +1,69 @@
+{
+  "containers": {
+    "sata": {
+      "device_path": "/dev/sdb",
+      "mount_path": "/mnt/proj"
+    }
+  },
+  "destination": {
+    "type": "nfs",
+    "root_path": "/net/efs01",
+    "endpoint": "",
+    "limits": {
+      "critical": 1,
+      "warning": 5
+    }
+  },
+  "source_options": {
+    "skip": {
+      "directories": [],
+      "files": {
+        "names": [],
+        "extensions": []
+      },
+      "links": "",
+      "empty": false
+    }
+  },
+  "destination_options": {
+    "preserve": true,
+    "preserve_level": 3,
+    "enforce_structure": {
+      "file_pattern": "",
+      "destination_pattern": ""
+    }
+  },
+  "permissions": {
+    "primary": {
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o700"
+    },
+    "acl": [
+      {
+        "uid": 1000,
+        "gid": 1000,
+        "access": "r",
+        "default": false
+      }
+    ]
+  },
+  "resources": {
+    "thread_count": 500
+  },
+  "syslog": true,
+  "workdir": "/ingestation/logs/${date}.log",
+  "naming": {
+    "log_file": "",
+    "codename": ""
+  },
+  "notify": {
+    "I'm the best uploader": "uploader@ingestation.com"
+  },
+  "exclude_devices": [
+    "DISKSN01"
+  ],
+  "include_devices": [
+    "ExTERNAL_DISK00"
+  ]
+}
