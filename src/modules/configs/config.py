@@ -75,3 +75,119 @@ class ApplicationConf(Conf):
 
     def __init__(self, conf_path: Union[str, bool]):
         super().__init__(conf_path, "application")
+
+
+# pylint: disable=too-many-instance-attributes
+class MergedConf:
+    """Class for merging configuration files"""
+
+    def __init__(self, logger: Logger, options: dict):
+        self.logger = logger
+        self.options = options
+
+        self.operator = OperatorConf(options["operator_conf"]).parse_conf()
+        self.project = ProjectConf(options["project_conf"]).parse_conf()
+        self.application = ApplicationConf(options["application_conf"]).parse_conf()
+
+        self.operator_keys = self.flatten_dict(
+            self.operator, exclude_keys=global_vars.config_rules["exclude_flatten"])
+        self.project_keys = self.flatten_dict(
+            self.project, exclude_keys=global_vars.config_rules["exclude_flatten"])
+        self.application_keys = self.flatten_dict(
+            self.application, exclude_keys=global_vars.config_rules["exclude_flatten"])
+
+        self.final = self.create_final_conf()
+
+    def flatten_dict(self, dct, parent_key='', sep='_', exclude_keys=None):
+        if exclude_keys is None:
+            exclude_keys = []
+        flattened = {}
+        for key, value in dct.items():
+            if key in exclude_keys:
+                flattened[key] = value
+            else:
+                new_key = f"{parent_key}{sep}{key}" if parent_key else key
+                if isinstance(value, list):
+                    for idx, item in enumerate(value):
+                        item_key = f"{new_key}{sep}{idx}"
+                        if isinstance(item, dict):
+                            flattened.update(self.flatten_dict(item, item_key, sep))
+                        else:
+                            flattened[item_key] = item
+                elif isinstance(value, dict):
+                    flattened.update(self.flatten_dict(value, new_key, sep))
+                else:
+                    flattened[new_key] = value
+        return flattened
+
+    def get_all_conf(self):
+        return templates.merged_conf.keys()
+
+    def create_final_conf(self) -> dict:
+        final_conf = {}
+        for key in self.get_all_conf():
+            if key in global_vars.config_rules["exclude_flatten"]:
+                final_conf[key] = self.merge_conf(key)
+            else:
+                final_conf[key] = self.overwrite_conf(key)
+            if not final_conf[key] and key in global_vars.mandatory_keys:
+                # pylint: disable=broad-exception-raised
+                raise Exception(f"Missing mandatory value of: {key}")
+        return final_conf
+
+    def merge_conf(self, key: str):
+        if key in global_vars.config_rules["merge_to_dict"]:
+            merge_conf = {}
+            if key in self.application_keys:
+                merge_conf.update(self.application_keys[key])
+            if key in self.project_keys:
+                merge_conf.update(self.project_keys[key])
+            if key in self.operator_keys:
+                merge_conf.update(self.operator_keys[key])
+            return merge_conf
+        merge_conf = []
+        if key in self.application_keys:
+            merge_conf.extend(self.application_keys[key])
+        if key in self.project_keys:
+            merge_conf.extend(self.project_keys[key])
+        if key in self.operator_keys:
+            merge_conf.extend(self.operator_keys[key])
+        return merge_conf
+
+    def overwrite_conf(self, key: str):
+        # pylint: disable=too-many-return-statements, too-many-branches
+        if key in global_vars.precedence_rules["app_proj_op"]:
+            if key in self.application_keys:
+                return self.application_keys[key]
+            if key in self.project_keys:
+                return self.project_keys[key]
+            return self.operator_keys[key]
+        if key in global_vars.precedence_rules["app_op_proj"]:
+            if key in self.application_keys:
+                return self.application_keys[key]
+            if key in self.operator_keys:
+                return self.operator_keys[key]
+            return self.project_keys[key]
+        if key in global_vars.precedence_rules["proj_op_app"]:
+            if key in self.project_keys:
+                return self.project_keys[key]
+            if key in self.operator_keys:
+                return self.operator_keys[key]
+            return self.application_keys[key]
+        if key in global_vars.precedence_rules["proj_app_op"]:
+            if key in self.project_keys:
+                return self.project_keys[key]
+            if key in self.application_keys:
+                return self.application_keys[key]
+            return self.operator_keys[key]
+        if key in global_vars.precedence_rules["op_app_proj"]:
+            if key in self.operator_keys:
+                return self.operator_keys[key]
+            if key in self.application_keys:
+                return self.application_keys[key]
+            return self.project_keys[key]
+        if key in self.operator_keys:
+            return self.operator_keys[key]
+        if key in self.project_keys:
+            return self.project_keys[key]
+        return self.application_keys[key]
