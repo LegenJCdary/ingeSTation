@@ -1,10 +1,13 @@
+from logging import Logger
 from json import loads
 from typing import Union
 import os
 
 from jsonschema import validate
 
+from .schemas import application, project, operator
 from ..global_vars import global_vars
+from .templates import templates
 
 
 class Conf:
@@ -51,3 +54,10 @@ class Conf:
                 return os.path.join(os.getcwd(), file)
 
         return ""
+
+
+class ApplicationConf(Conf):
+    """Class for application configuration files"""
+
+    def __init__(self, conf_path: Union[str, bool]):
+        super().__init__(conf_path, "application")
