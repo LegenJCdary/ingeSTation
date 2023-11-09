@@ -56,6 +56,13 @@ class Conf:
         return ""
 
 
+class OperatorConf(Conf):
+    """Class for operator configuration files"""
+
+    def __init__(self, conf_path: Union[str, bool]):
+        super().__init__(conf_path, "operator")
+
+
 class ProjectConf(Conf):
     """Class for project configuration files"""
 
