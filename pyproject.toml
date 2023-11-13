@@ -1,2 +1,5 @@
 [build-system]
 requires = ["setuptools", "wheel"]
+
+[tool.coverage.run]
+omit = ["/usr/local/*","tests/*","*/__init__.py"]
