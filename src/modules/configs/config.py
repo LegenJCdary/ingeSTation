@@ -2,8 +2,10 @@ import os
 from json import loads
 from typing import Union
 
-from ingestation.modules.global_vars import APPLICATION_DIR
 from jsonschema import validate, ValidationError
+
+from ingestation.modules.configs.schemas import application
+from ingestation.modules.global_vars import APPLICATION_DIR
 
 
 def convert_schema_name(schema_file):
@@ -53,3 +55,10 @@ class Conf:
 
         raise FileNotFoundError(f"[CRITICAL]: {self.conf_type.capitalize()} "
                                 f"configuration could not be found: {conf_path}.")
+
+
+class ApplicationConf(Conf):
+    """Class for application configuration files"""
+
+    def __init__(self, conf_path: Union[str, bool]):
+        super().__init__(conf_path, "application", application)
