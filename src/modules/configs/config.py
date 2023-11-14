@@ -46,3 +46,10 @@ class Conf:
             raise FileNotFoundError(f"[CRITICAL]: {self.conf_type.capitalize()}"
                                     " configuration could not be obtained.")
         return conf_path
+
+
+class ApplicationConf(Conf):
+    """Class for application configuration files"""
+
+    def __init__(self, conf_path: Union[str, bool]):
+        super().__init__(conf_path, "application", schemas.application)
