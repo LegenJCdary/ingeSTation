@@ -1,0 +1,20 @@
+{
+  "destination_options": {
+    "preserve": false,
+    "preserve_level": 2,
+    "enforce_structure": {
+      "file_pattern": "f pattern",
+      "destination_pattern": "dest pattern"
+    }
+  },
+  "workdir": "/users/my_logs/${date}.log",
+  "notify": {
+    "HPC_upload": "upload_support@ingestation.com"
+  },
+  "exclude_devices": [
+    "DISK_SN_XX"
+  ],
+  "include_devices": [
+    "EXTERNAL_DISK01"
+  ]
+}
