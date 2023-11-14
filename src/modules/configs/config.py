@@ -4,7 +4,7 @@ from typing import Union
 
 from jsonschema import validate, ValidationError
 
-from ingestation.modules.configs.schemas import application
+from ingestation.modules.configs.schemas import application, project
 from ingestation.modules.global_vars import APPLICATION_DIR
 
 
@@ -62,3 +62,10 @@ class ApplicationConf(Conf):
 
     def __init__(self, conf_path: Union[str, bool]):
         super().__init__(conf_path, "application", application)
+
+
+class ProjectConf(Conf):
+    """Class for project configuration files"""
+
+    def __init__(self, conf_path: Union[str, bool]):
+        super().__init__(conf_path, "project", project)
