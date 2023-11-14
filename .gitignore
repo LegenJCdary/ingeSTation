@@ -1,4 +1,18 @@
 *.pyc
 *.swp
+
+__pycache__/
 .idea/
+venv/
 worktrees/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+
+# Environments
+venv/
+
+
+# IntelliJ files
+.idea/
