@@ -4,7 +4,7 @@ from typing import Union
 
 from jsonschema import validate, ValidationError
 
-from ingestation.modules.configs.schemas import application, project
+from ingestation.modules.configs.schemas import application, project, operator
 from ingestation.modules.global_vars import APPLICATION_DIR
 
 
@@ -69,3 +69,10 @@ class ProjectConf(Conf):
 
     def __init__(self, conf_path: Union[str, bool]):
         super().__init__(conf_path, "project", project)
+
+
+class OperatorConf(Conf):
+    """Class for operator configuration files"""
+
+    def __init__(self, conf_path: Union[str, bool]):
+        super().__init__(conf_path, "operator", operator)
