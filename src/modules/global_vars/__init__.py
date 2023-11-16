@@ -70,3 +70,13 @@ CONFIG_RULES = {
         "priority": ("operator", "project", "application")
     }
 }
+
+DEFAULT_VALUES = {
+    "destination_type": "",
+    "exclude_devices": [],
+    "include_devices": [],
+    "notify": {},
+    "permissions_primary_uid": False,
+    "permissions_primary_gid": False,
+    "permissions_primary_mode": ""
+}
