@@ -32,11 +32,20 @@ CONFIG_RULES = {
     "exclude_devices": {
         "mode": "inclusive",
         "inclusive": ("cli", "operator", "project", "application")
+<<<<<<< HEAD
+=======
+        "default": []
+>>>>>>> 277e9fa9b72346b65566d29496a9d68678db06a8
     },
     "include_devices": {
         "mode": "inclusive",
         "inclusive": ("cli", "operator", "project", "application")
+<<<<<<< HEAD
     },
+=======
+        "default": []
+    }
+>>>>>>> 277e9fa9b72346b65566d29496a9d68678db06a8
     "naming_codename": {
         "mode": "priority",
         "priority": ("project", "application")
@@ -48,18 +57,34 @@ CONFIG_RULES = {
     "notify": {
         "mode": "inclusive",
         "inclusive": ("operator", "project", "application")
+<<<<<<< HEAD
+=======
+        "default": {}
+>>>>>>> 277e9fa9b72346b65566d29496a9d68678db06a8
     },
     "permissions_primary_uid": {
         "mode": "priority",
         "priority": ("project", "application")
+<<<<<<< HEAD
+=======
+        "default": False
+>>>>>>> 277e9fa9b72346b65566d29496a9d68678db06a8
     },
     "permissions_primary_gid": {
         "mode": "priority",
         "priority": ("project", "application")
+<<<<<<< HEAD
+=======
+        "default": False
+>>>>>>> 277e9fa9b72346b65566d29496a9d68678db06a8
     },
     "permissions_primary_mode": {
         "mode": "priority",
         "priority": ("project", "application")
+<<<<<<< HEAD
+=======
+        "default": ""
+>>>>>>> 277e9fa9b72346b65566d29496a9d68678db06a8
     },
     "resources_thread_count": {
         "mode": "exclusive",
@@ -70,6 +95,7 @@ CONFIG_RULES = {
         "priority": ("operator", "project", "application")
     }
 }
+<<<<<<< HEAD
 
 DEFAULT_VALUES = {
     "destination_type": "",
@@ -80,3 +106,5 @@ DEFAULT_VALUES = {
     "permissions_primary_gid": False,
     "permissions_primary_mode": ""
 }
+=======
+>>>>>>> 277e9fa9b72346b65566d29496a9d68678db06a8

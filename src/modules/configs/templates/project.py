@@ -1,6 +1,9 @@
 config = {
     "destination": {
+<<<<<<< HEAD
         "type": None,
+=======
+>>>>>>> 277e9fa9b72346b65566d29496a9d68678db06a8
         "root_path": None,
         "endpoint": None,
         "limits": {
