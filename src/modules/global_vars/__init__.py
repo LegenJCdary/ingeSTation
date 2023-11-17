@@ -36,7 +36,7 @@ CONFIG_RULES = {
     "include_devices": {
         "mode": "inclusive",
         "inclusive": ("cli", "operator", "project", "application")
-    }
+    },
     "naming_codename": {
         "mode": "priority",
         "priority": ("project", "application")

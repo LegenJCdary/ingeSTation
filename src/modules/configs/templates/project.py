@@ -1,5 +1,6 @@
 config = {
     "destination": {
+        "type": None,
         "root_path": None,
         "endpoint": None,
         "limits": {
