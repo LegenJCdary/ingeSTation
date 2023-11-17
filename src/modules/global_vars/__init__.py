@@ -31,14 +31,14 @@ CONFIG_RULES = {
     },
     "exclude_devices": {
         "mode": "inclusive",
-        "inclusive": ("cli", "operator", "project", "application")
+        "inclusive": ("cli", "operator", "project", "application"),
         "default": []
     },
     "include_devices": {
         "mode": "inclusive",
-        "inclusive": ("cli", "operator", "project", "application")
+        "inclusive": ("cli", "operator", "project", "application"),
         "default": []
-    }
+    },
     "naming_codename": {
         "mode": "priority",
         "priority": ("project", "application")
@@ -49,7 +49,7 @@ CONFIG_RULES = {
     },
     "notify": {
         "mode": "inclusive",
-        "inclusive": ("operator", "project", "application")
+        "inclusive": ("operator", "project", "application"),
         "default": {}
     },
     "permissions_primary_uid": {
