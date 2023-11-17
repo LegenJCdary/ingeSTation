@@ -5,6 +5,20 @@ from socket import gethostname
 from typing import Tuple
 
 
+def get_exec_modes(cli_options: dict):
+    exec_modes = ["dry", "verify", "restart"]
+    modes = []
+
+    for mode in exec_modes:
+        if cli_options.get(mode, False):
+            modes.append(mode)
+
+    if not modes:
+        modes.append("standard")
+
+    return ", ".join(modes).strip(", ")
+
+
 class InitParams:
 
     def __init__(self):
