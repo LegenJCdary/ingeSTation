@@ -4,8 +4,11 @@ from typing import Union
 
 from jsonschema import validate, ValidationError
 
-from ingestation.modules.configs.schemas import application, project, operator
-from ingestation.modules.global_vars import APPLICATION_DIR
+from ingestation.modules.configs.schemas import application, project, operator, \
+    final as final_schema
+from ingestation.modules.configs.templates import final
+from ingestation.modules.global_vars import APPLICATION_DIR, CONFIG_RULES
+from ingestation.modules.outputs.loggers import Loggers
 
 
 def convert_schema_name(schema_file):
@@ -23,6 +26,14 @@ def validate_json(conf: dict, schema_file) -> None:
             f"[CRITICAL]: {convert_schema_name(schema_file).capitalize()} "
             f"config validation failed.") \
             from ex
+
+
+class ConfigRulesError(Exception):
+    pass
+
+
+class ConfigFilesError(Exception):
+    pass
 
 
 class Conf:
@@ -76,3 +87,138 @@ class OperatorConf(Conf):
 
     def __init__(self, conf_path: Union[str, bool]):
         super().__init__(conf_path, "operator", operator)
+
+
+class MergedConf:
+    def __init__(self, logger: Loggers):
+        self.logger = logger
+        self.application = ApplicationConf("").parse_conf()
+        self.project = ProjectConf("").parse_conf()
+        self.operator = OperatorConf("").parse_conf()
+
+        self.merged_conf = {
+            "cli": {},
+            "application": self.merge_conf(self.application),
+            "project": self.merge_conf(self.project),
+            "operator": self.merge_conf(self.operator)
+        }
+
+        self.final = self.create_final_conf()
+
+    def create_final_conf(self):
+        final_conf = self.merge_conf(final.template)
+        rule_mode = ("exclusive", "inclusive", "priority")
+        rule_order = ("application", "project", "operator", "cli")
+
+        for key, value in CONFIG_RULES.items():
+            rule = CONFIG_RULES.get(key)
+            if not rule:
+                raise ConfigRulesError(f"No rules defined for conf key ({key}). "
+                                       f"Update CONFIG_RULES.")
+            mode = value.get("mode")
+            if not mode:
+                raise ConfigRulesError(
+                    f"Mode is undefined. "
+                    f"Rule mode for key ({key}) needs to be defined for rule mode. "
+                    f"Update CONFIG_RULES."
+                )
+            if mode not in rule_mode:
+                raise ConfigRulesError(
+                    f"Invalid mode ({mode}) in key ({key}) is defined. "
+                    f"Rule mode must be one of {rule_mode}. Update CONFIG_RULES."
+                )
+
+            order = value.get(mode)
+            if not order:
+                raise ConfigRulesError(
+                    f"Order is undefined. "
+                    f"Rule order for key ({key}) needs to be defined for rule mode. "
+                    f"Update CONFIG_RULES."
+                )
+            for odr in order:
+                if odr not in rule_order:
+                    raise ConfigRulesError(
+                        f"Invalid order ({odr}) in key ({key}) is defined. "
+                        f"Rule order must be one of {rule_order}. Update CONFIG_RULES."
+                    )
+            final_conf[key] = self.get_final_value(key)
+
+        validate_json(final_conf, final_schema)
+
+        return final_conf
+
+    def get_final_value(self, merged_key):
+        value = self.apply_config_rule(merged_key)
+        if value is None:
+            return CONFIG_RULES[merged_key].get("default")
+
+        return value
+
+    def apply_config_rule(self, merged_key):
+        mode = CONFIG_RULES.get(merged_key).get("mode")
+        if mode == "exclusive":
+            value = self.apply_exclusive_rule(merged_key)
+        elif mode == "inclusive":
+            value = self.apply_inclusive_rule(merged_key)
+        else:
+            value = self.apply_priority_rule(merged_key)
+
+        return value
+
+    def merge_conf(self, dct):
+        merged_conf = {}
+        for key, value in dct.items():
+            if isinstance(value, dict):
+                nested = self.merge_conf(value)
+                for nested_key, nested_value in nested.items():
+                    merged_conf[f"{key}_{nested_key}"] = nested_value
+            else:
+                merged_conf[key] = value
+
+        return merged_conf
+
+    def apply_exclusive_rule(self, merged_key):
+        """
+        1. Check if value is defined in both -> raise Exc
+        2. Return value if defined in any
+        3. If undefined -> return None
+        """
+        order = CONFIG_RULES.get(merged_key)["exclusive"]
+
+        value_count = 0
+        value, effective_value = None, None
+        for config in order:
+            value = self.merged_conf[config].get(merged_key)
+            if value:
+                value_count += 1
+                effective_value = value
+            if value_count > 1:
+                raise ConfigFilesError(
+                    f"{merged_key} is defined in more than one config: {str(order)}"
+                )
+        if value_count == 0:
+            return None
+        return effective_value
+
+    def apply_inclusive_rule(self, merged_key):
+        """Just merge all of them (remove duplicates)"""
+        order = CONFIG_RULES.get(merged_key)["inclusive"]
+        merged_value = []
+        for conf in order:
+            value = self.merged_conf[conf].get(merged_key)
+            if value:
+                merged_value.extend(value)
+
+        return list(set(merged_value))
+
+    def apply_priority_rule(self, merged_key):
+        """
+        Cascade/iterate conf by conf using defined order
+        If undefined at the end, return None
+        """
+        order = CONFIG_RULES.get(merged_key)["priority"]
+        for conf in order:
+            value = self.merged_conf[conf].get(merged_key)
+            if value is not None:
+                return value
+        return None
