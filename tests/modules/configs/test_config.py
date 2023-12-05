@@ -1,9 +1,12 @@
+import os
 import pytest
 
 from jsonschema import ValidationError
 
-from ingestation.modules.configs.config import validate_json
+from ingestation.modules.configs.config import ApplicationConf, ProjectConf, OperatorConf, \
+    validate_json
 from ingestation.modules.configs.schemas import application, project, operator
+from ingestation.modules.global_vars import APPLICATION_DIR
 from ingestation_test.data.configs import validate_json_passed, validate_json_failed, \
     error_messages as err_msg
 
@@ -86,3 +89,29 @@ def test_validate_json_validation_passed(conf_type: str, schema):
     conf = full_conf.get("validation_passed")
 
     assert validate_json(conf, schema) is None
+
+
+class TestConf:
+    """Class to test functions of Conf class"""
+    current_path = os.path.join(os.path.dirname(__file__))
+    test_data_path = os.path.join(os.path.dirname(os.path.dirname(current_path)),
+                                  "data", "configs")
+
+    @pytest.mark.parametrize("conf_type,conf", [("application", ApplicationConf("")),
+                                                ("project", ProjectConf("")),
+                                                ("operator", OperatorConf(""))])
+    def test_get_conf_path_application_dir(self, conf_type, conf):
+        assert conf.get_conf_path("") == os.path.join(APPLICATION_DIR, f"{conf_type}.json")
+
+    def test_get_conf_path_file_found(self):
+        conf_path = os.path.join(self.test_data_path, "application.json")
+        conf = ApplicationConf(conf_path)
+        assert conf_path == conf.get_conf_path(conf_path)
+
+    def test_get_conf_path_file_not_found(self):
+        conf_path = os.path.join(self.test_data_path, "project.json")
+        with pytest.raises(FileNotFoundError) as ex:
+            conf = ProjectConf(conf_path)
+            conf.get_conf_path(conf_path)
+        assert ex.type == FileNotFoundError
+        assert err_msg.get_conf_path.get("file_not_found") in str(ex.value)
