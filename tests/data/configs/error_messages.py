@@ -4,3 +4,7 @@ validate_json = {
     "invalid_data_type": "Failed validating 'type' in schema",
     "too_long_value": "Failed validating 'maxLength' in schema"
 }
+
+get_conf_path = {
+    "file_not_found": "configuration could not be found"
+}
