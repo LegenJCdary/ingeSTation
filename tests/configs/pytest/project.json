@@ -1,0 +1,30 @@
+{
+  "destination": {
+    "type": "nfs",
+    "root_path": "/net/efs01",
+    "endpoint": "ep01",
+    "limits": {
+      "critical": 1,
+      "warning": 1
+    }
+  },
+  "permissions": {
+    "primary": {
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o0700"
+    }
+  },
+  "workdir": "/tmp/ingestation",
+  "naming": {
+    "log_file": "ingestation.log",
+    "codename": "sequence"
+  },
+  "notify": [
+    "uploader@ingestation.com"
+  ],
+  "exclude": [
+    "VAHEX5ZZ"
+  ],
+  "include": []
+}

@@ -1,0 +1,27 @@
+{
+  "containers": {
+    "sata": {
+      "device_path": "/dev",
+      "mount_path": "/mnt"
+    }
+  },
+  "resources": {
+    "thread_count": 1
+  },
+  "workdir": "/tmp/ingestation",
+  "naming": {
+    "log_file": "ingestation.log",
+    "codename": "job"
+  },
+  "notify": [
+    "zh23@ingestation.com",
+    "kuba@ingestation.com"
+  ],
+  "exclude": [
+    "VAHEX5YZ"
+  ],
+  "include": [
+    "S4WWNJ0N420419V",
+    "S4WWNJ0N420420V"
+  ]
+} 
