@@ -1,0 +1,16 @@
+{
+  "workdir": "/tmp/ingestation",
+  "naming": {
+    "log_file": "ingestation.log",
+    "codename": "run"
+  },
+  "notify": [
+    "upload_support@ingestation.com"
+  ],
+  "exclude": [
+    "VAHEX6YZ"
+  ],
+  "include": [
+    "S4WWNJ0N420421V"
+  ]
+}
