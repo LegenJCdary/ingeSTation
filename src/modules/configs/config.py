@@ -2,9 +2,8 @@ import os
 from json import loads
 from typing import Union
 
-from jsonschema import validate, ValidationError
-
 from ingestation.modules.global_vars import APPLICATION_DIR
+from jsonschema import validate, ValidationError
 
 
 def convert_schema_name(schema_file):
