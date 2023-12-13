@@ -24,6 +24,14 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
           pip install .
+      - name: Clear and recreate configs dir
+        run: |
+          sudo rm -rf /etc/ingestation
+          sudo mkdir /etc/ingestation
+          sudo chmod 0755 /etc/ingestation
+      - name: Copy valid configs
+        run: |
+          sudo cp tests/configs/pytest/*.json /etc/ingestation/
       - name: Test with pytest
         run: |
           pytest

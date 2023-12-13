@@ -1,0 +1,24 @@
+{
+  "containers": {
+    "sata": {
+      "device_path": "/dev",
+      "mount_path": "/mnt"
+    }
+  },
+  "resources": {
+    "thread_count": 1
+  },
+  "workdir": "/var/log/",
+  "naming": {
+    "log_file": "ingestation.log",
+    "codename": "job"
+  },
+  "notify": [
+    "zh23@ingestation.com",
+    "kuba@ingestation.com"
+  ],
+  "exclude": [
+    "WD-WCC4E5XB5R5F"
+  ],
+  "include": []
+}
