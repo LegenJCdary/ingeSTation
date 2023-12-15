@@ -13,7 +13,7 @@ class InitParams:
         self.hostname = gethostname()
 
     @staticmethod
-    def get_start_point() -> str:
+    def get_start_point() -> datetime:
         return datetime.now()
 
     @staticmethod
