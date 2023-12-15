@@ -1,16 +1,15 @@
 import os
-import pytest
-import sys
 
+import pytest
 from jsonschema import ValidationError
 
-sys.path.append(os.getcwd())
-
-from ingestation.modules.configs.config import ApplicationConf, ProjectConf, OperatorConf,\
-    validate_json
+from ingestation.modules.configs.config import ApplicationConf, ProjectConf, OperatorConf, \
+    MergedConf, validate_json
 from ingestation.modules.configs.schemas import application, project, operator
 from ingestation.modules.global_vars import APPLICATION_DIR
-from tests.data.configs import validate_json_passed, validate_json_failed, err_msg
+from ingestation.modules.outputs.loggers import Loggers
+from ingestation_test.data.configs import validate_json_passed, validate_json_failed, err_msg, \
+    merge_conf, config_rule
 
 
 @pytest.mark.parametrize("conf_type,schema", [
@@ -121,3 +120,134 @@ class TestConf:
             conf.get_conf_path(conf_path)
         assert ex.type == FileNotFoundError
         assert err_msg.get_conf_path.get("file_not_found") in str(ex.value)
+
+
+class TestMergedConf:
+    """Class to test functions of MergedConf Class"""
+
+    @staticmethod
+    def none_to_dict(obj):
+        if obj is None:
+            return {}
+        return obj
+
+    @pytest.mark.parametrize("dct, expect", [
+        [merge_conf.dct1, merge_conf.expect1],
+        [merge_conf.dct2, merge_conf.expect2],
+        [merge_conf.dct3, merge_conf.expect3],
+    ])
+    def test_merge_conf(self, dct, expect):
+        conf = MergedConf(Loggers({}))
+        assert conf.merge_conf(dct) == expect
+
+    @pytest.mark.parametrize("merged_key, rule_type", [
+        ["resources_thread_count", "exclusive_over_defined"]
+    ])
+    def test_apply_config_rule_exclusive_over_defined(self, merged_key, rule_type):
+        config = MergedConf(Loggers({}))
+
+        app = config_rule.application.get(rule_type)
+        prj = config_rule.project.get(rule_type)
+        op = config_rule.operator.get(rule_type)
+
+        config.merged_confs = {
+            "application": config.merge_conf(self.none_to_dict(app)),
+            "project": config.merge_conf(self.none_to_dict(prj)),
+            "operator": config.merge_conf(self.none_to_dict(op))
+        }
+        error_message = err_msg.apply_config_rule.get(rule_type)
+
+        with pytest.raises(Exception) as ex:
+            config.apply_config_rule(merged_key)
+        assert error_message in str(ex)
+
+    @pytest.mark.parametrize("merged_key, rule_type", [
+        ["resources_thread_count", "exclusive_undefined"]
+    ])
+    def test_apply_config_rule_exclusive_undefined(self, merged_key, rule_type):
+        config = MergedConf(Loggers({}))
+
+        app = config_rule.application.get(rule_type)
+        prj = config_rule.project.get(rule_type)
+        op = config_rule.operator.get(rule_type)
+
+        config.merged_confs = {
+            "application": config.merge_conf(self.none_to_dict(app)),
+            "project": config.merge_conf(self.none_to_dict(prj)),
+            "operator": config.merge_conf(self.none_to_dict(op))
+        }
+
+        assert config.apply_exclusive_rule(merged_key) is None
+
+    @pytest.mark.parametrize("merged_key, rule_type", [
+        ["containers_sata_device_path", "exclusive_passed"],
+    ])
+    def test_apply_config_rule_exclusive_passed(self, merged_key, rule_type):
+        config = MergedConf(Loggers({}))
+
+        app = config_rule.application.get(rule_type)
+        prj = config_rule.project.get(rule_type)
+        op = config_rule.operator.get(rule_type)
+
+        config.merged_confs = {
+            "application": config.merge_conf(self.none_to_dict(app)),
+            "project": config.merge_conf(self.none_to_dict(prj)),
+            "operator": config.merge_conf(self.none_to_dict(op))
+        }
+
+        assert config.apply_exclusive_rule(merged_key) == config_rule.result.get(rule_type)
+
+    @pytest.mark.parametrize("merged_key, rule_type", [
+        ["notify", "inclusive_passed"],
+    ])
+    def test_apply_config_rule_inclusive_passed(self, merged_key, rule_type):
+        config = MergedConf(Loggers({}))
+
+        app = config_rule.application.get(rule_type)
+        prj = config_rule.project.get(rule_type)
+        op = config_rule.operator.get(rule_type)
+
+        config.merged_confs = {
+            "application": config.merge_conf(self.none_to_dict(app)),
+            "project": config.merge_conf(self.none_to_dict(prj)),
+            "operator": config.merge_conf(self.none_to_dict(op))
+        }
+
+        assert sorted(config.apply_inclusive_rule(merged_key)) \
+               == sorted(config_rule.result.get(rule_type))
+
+    @pytest.mark.parametrize("merged_key, rule_type", [
+        ["workdir", "priority_passed"],
+    ])
+    def test_apply_config_rule_priority_passed(self, merged_key, rule_type):
+        config = MergedConf(Loggers({}))
+
+        app = config_rule.application.get(rule_type)
+        prj = config_rule.project.get(rule_type)
+        op = config_rule.operator.get(rule_type)
+
+        config.merged_confs = {
+            "application": config.merge_conf(self.none_to_dict(app)),
+            "project": config.merge_conf(self.none_to_dict(prj)),
+            "operator": config.merge_conf(self.none_to_dict(op))
+        }
+
+        assert config.apply_priority_rule(merged_key) == config_rule.result.get(rule_type)
+
+    @pytest.mark.parametrize("merged_key, rule_type", [
+        ["destination_type", "priority_none"],
+    ])
+    def test_apply_config_rule_priority_none(self, merged_key, rule_type):
+        config = MergedConf(Loggers({}))
+
+        app = config_rule.application.get(rule_type)
+        prj = config_rule.project.get(rule_type)
+        op = config_rule.operator.get(rule_type)
+
+        config.merged_confs = {
+            "application": config.merge_conf(self.none_to_dict(app)),
+            "project": config.merge_conf(self.none_to_dict(prj)),
+            "operator": config.merge_conf(self.none_to_dict(op))
+        }
+
+        assert config.apply_priority_rule(merged_key) is None
