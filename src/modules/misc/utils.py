@@ -1,6 +1,6 @@
 from datetime import datetime
-from os import getlogin
-from pwd import getpwnam
+from os import getlogin, getuid
+from pwd import getpwnam, getpwuid
 from socket import gethostname
 from typing import Tuple
 
@@ -18,5 +18,9 @@ class InitParams:
 
     @staticmethod
     def get_caller_id() -> Tuple[int, int, str]:
-        user = getpwnam(getlogin())
+        try:
+            user = getpwnam(getlogin())
+        # Detected on Ubuntu 20.04 LTS (GNU/Linux 5.10.16.3-microsoft-standard-WSL2 x86_64)
+        except FileNotFoundError:
+            user = getpwuid(getuid())
         return user.pw_uid, user.pw_gid, user.pw_name

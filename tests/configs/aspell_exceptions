@@ -45,6 +45,7 @@ expr
 fi
 filesystem
 Filesystems
+FileNotFoundError
 fixme
 FIXME
 fmt
@@ -55,6 +56,8 @@ getattr
 gethostname
 getlogin
 getpwnam
+getpwuid
+getuid
 gid
 gitlab
 gv
@@ -77,6 +80,7 @@ levelname
 LF
 liberabit
 lintTesting
+LTS
 mcs
 MERCHANTABILITY
 metaclass
