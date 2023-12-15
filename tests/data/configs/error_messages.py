@@ -8,3 +8,8 @@ validate_json = {
 get_conf_path = {
     "file_not_found": "configuration could not be found"
 }
+
+apply_config_rule = {
+    "exclusive_over_defined": "is defined in more than one config",
+    "exclusive_undefined": "is not defined in any config"
+}
