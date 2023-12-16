@@ -21,6 +21,7 @@ classmethod
 cli
 CliInput
 cls
+colour
 ColourFormatter
 config
 configs

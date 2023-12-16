@@ -2,6 +2,9 @@ import logging
 
 
 class Loggers:
+    """
+    Application's logging interface.
+    """
 
     main_name = "ingestation_main_logger"
     main_fmt = "%(asctime)s [%(levelname)s]: %(message)s"
@@ -35,6 +38,13 @@ class Loggers:
 
 
 class ColourFormatter(logging.Formatter):
+    """
+    Logging formatter designed to colour console messages.
+
+    Overrides level_formats instance variable of logging.Formatter.
+    Overrides format() instance method of logging.Formatter.
+    Extends __init__ of logging.Formatter with ANSI escape colour definitions.
+    """
 
     def __init__(self, formatter):
         super().__init__()

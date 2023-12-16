@@ -6,6 +6,9 @@ from typing import Tuple
 
 
 class InitParams:
+    """
+    Collection of basic parameters describing environment of Operator's upload process.
+    """
 
     def __init__(self):
         self.start_point = self.get_start_point()

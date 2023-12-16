@@ -4,6 +4,11 @@ from typing import Tuple, Union
 
 
 class CliInput:
+    """
+    Command-line interface handler.
+
+    Collects, parses and validates arguments passed on execution.
+    """
 
     option_names = {
         "debug": ["--debug", "-d"],
