@@ -31,7 +31,7 @@ class Loggers:
         handler = logging.StreamHandler()
         handler.setFormatter(ColourFormatter(self.console_fmt))
 
-        if not self.options["debug"]:
+        if self.options.get("debug") is not True:
             handler.setLevel(logging.INFO)
 
         self.logger.addHandler(handler)
