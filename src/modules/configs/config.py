@@ -24,7 +24,7 @@ def validate_json(conf: dict, schema_file) -> None:
     except ValidationError as ex:
         raise ValidationError(
             f"[CRITICAL]: {convert_schema_name(schema_file).capitalize()} "
-            f"config validation failed.") \
+            f"config validation failed. {str(ex)}") \
             from ex
 
 
@@ -96,17 +96,49 @@ class MergedConf:
         self.project = ProjectConf("").parse_conf()
         self.operator = OperatorConf("").parse_conf()
 
-        self.merged_conf = {
+        self.merged_confs = {
             "cli": {},
             "application": self.merge_conf(self.application),
             "project": self.merge_conf(self.project),
             "operator": self.merge_conf(self.operator)
         }
 
+        self.merged_conf = self.create_merged_conf()
         self.final = self.create_final_conf()
 
-    def create_final_conf(self):
-        final_conf = self.merge_conf(final.template)
+    @staticmethod
+    def extract_dict_keys(dct):
+        keys = []
+
+        for key, value in dct.items():
+            keys.append(key)
+            if isinstance(value, dict):
+                sub_keys = MergedConf.extract_dict_keys(value)
+                keys.extend(sub_keys)
+
+        return keys
+
+    @staticmethod
+    def replace_str_in_list(lst: list, old_str, new_str):
+        for s in lst:
+            if old_str in s:
+                new_s = str.replace(s, old_str, new_str)
+                lst.remove(s)
+                lst.append(new_s)
+        return lst
+
+    @staticmethod
+    def add_values_to_dict_keys(dct, keys, value):
+        if len(keys) == 1:
+            dct[keys[0]] = value
+        else:
+            key = keys[0]
+            if key not in dct:
+                dct[key] = {}
+            MergedConf.add_values_to_dict_keys(dct[key], keys[1:], value)
+
+    def create_merged_conf(self):
+        merged_conf = self.merge_conf(final.template)
         rule_mode = ("exclusive", "inclusive", "priority")
         rule_order = ("application", "project", "operator", "cli")
 
@@ -141,14 +173,13 @@ class MergedConf:
                         f"Invalid order ({odr}) in key ({key}) is defined. "
                         f"Rule order must be one of {rule_order}. Update CONFIG_RULES."
                     )
-            final_conf[key] = self.get_final_value(key)
+            merged_conf[key] = self.get_final_value(key)
 
-        validate_json(final_conf, final_schema)
-
-        return final_conf
+        return merged_conf
 
     def get_final_value(self, merged_key):
         value = self.apply_config_rule(merged_key)
+
         if value is None:
             return CONFIG_RULES[merged_key].get("default")
 
@@ -156,6 +187,7 @@ class MergedConf:
 
     def apply_config_rule(self, merged_key):
         mode = CONFIG_RULES.get(merged_key).get("mode")
+
         if mode == "exclusive":
             value = self.apply_exclusive_rule(merged_key)
         elif mode == "inclusive":
@@ -167,6 +199,7 @@ class MergedConf:
 
     def merge_conf(self, dct):
         merged_conf = {}
+
         for key, value in dct.items():
             if isinstance(value, dict):
                 nested = self.merge_conf(value)
@@ -177,6 +210,29 @@ class MergedConf:
 
         return merged_conf
 
+    def create_final_conf(self):
+        final_extracted_keys = MergedConf.extract_dict_keys(final.template)
+        final_conf = {}
+        excluded_keys = []
+
+        for key in final_extracted_keys:
+            if "_" in key:
+                excluded_keys.append(key)
+
+        for key, value in self.merged_conf.items():
+            for ex_key in excluded_keys:
+                if ex_key in key:
+                    new_ex_key = str.replace(ex_key, "_", "-")
+                    key = str.replace(key, ex_key, new_ex_key)
+                    break
+            separated_key = str.split(key, "_")
+            separated_key = MergedConf.replace_str_in_list(separated_key, "-", "_")
+            MergedConf.add_values_to_dict_keys(final_conf, separated_key, value)
+
+        validate_json(final_conf, final_schema)
+
+        return final_conf
+
     def apply_exclusive_rule(self, merged_key):
         """
         1. Check if value is defined in both -> raise Exc
@@ -184,12 +240,12 @@ class MergedConf:
         3. If undefined -> return None
         """
         order = CONFIG_RULES.get(merged_key)["exclusive"]
-
         value_count = 0
         value, effective_value = None, None
+
         for config in order:
-            value = self.merged_conf[config].get(merged_key)
-            if value:
+            value = self.merged_confs[config].get(merged_key)
+            if value is not None:
                 value_count += 1
                 effective_value = value
             if value_count > 1:
@@ -198,14 +254,16 @@ class MergedConf:
                 )
         if value_count == 0:
             return None
+
         return effective_value
 
     def apply_inclusive_rule(self, merged_key):
         """Just merge all of them (remove duplicates)"""
         order = CONFIG_RULES.get(merged_key)["inclusive"]
         merged_value = []
+
         for conf in order:
-            value = self.merged_conf[conf].get(merged_key)
+            value = self.merged_confs[conf].get(merged_key)
             if value:
                 merged_value.extend(value)
 
@@ -217,8 +275,10 @@ class MergedConf:
         If undefined at the end, return None
         """
         order = CONFIG_RULES.get(merged_key)["priority"]
+
         for conf in order:
-            value = self.merged_conf[conf].get(merged_key)
+            value = self.merged_confs[conf].get(merged_key)
             if value is not None:
                 return value
+
         return None

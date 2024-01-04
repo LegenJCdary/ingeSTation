@@ -2,68 +2,82 @@ schema = {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-        "containers_sata_device_path": {
-            "type": "string",
-            "maxLength": 4096
+        "containers": {
+            "type": "object",
+            "properties": {
+                "sata": {
+                    "type": "object",
+                    "properties": {
+                        "device_path": {
+                            "type": "string",
+                            "minLength": 4,
+                            "maxLength": 4096,
+                            "pattern": "^/\\w+"
+                        },
+                        "mount_path": {
+                            "type": "string",
+                            "minLength": 2,
+                            "maxLength": 4096,
+                            "pattern": "^/\\w+"
+                        }
+                    },
+                    "additionalProperties": False,
+                    "required": [
+                        "device_path",
+                        "mount_path"
+                    ]
+                }
+            },
+            "additionalProperties": False,
+            "required": ["sata"]
         },
-        "containers_sata_mount_path": {
-            "type": "string",
-            "maxLength": 4096
-        },
-        "destination_type": {
-            "type": "string",
-            "maxLength": 4096
-        },
-        "destination_root_path": {
-            "type": "string",
-            "maxLength": 4096
-        },
-        "destination_endpoint": {
-            "type": "string",
-            "maxLength": 4096
-        },
-        "destination_limits_critical": {
-            "type": "integer"
-        },
-        "destination_limits_warning": {
-            "type": "integer"
-        },
-        "permissions_primary_uid": {
-            "type": "integer"
-        },
-        "permissions_primary_gid": {
-            "type": "integer"
-        },
-        "permissions_primary_mode": {
-            "type": "string",
-            "maxLength": 4096
-        },
-        "resources_thread_count": {
-            "type": "integer"
-        },
-        "workdir": {
-            "type": "string",
-            "maxLength": 4096
-        },
-        "naming_log_file": {
-            "type": "string",
-            "maxLength": 255
-        },
-        "naming_codename": {
-            "type": "string",
-            "maxLength": 20
-        },
-        "notify": {
-            "type": "array",
-            "items": {
-                "type": "string",
-                "maxLength": 4096
-            }
+        "destination": {
+            "type": "object",
+            "properties": {
+                "endpoint": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096
+                },
+                "limits": {
+                    "type": "object",
+                    "properties": {
+                        "critical": {
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        "warning": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    "additionalProperties": False,
+                    "required": ["critical"]
+                },
+                "root_path": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 4096
+                },
+                "type": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 4096
+                }
+            },
+            "additionalProperties": False,
+            "required": [
+                "endpoint",
+                "limits",
+                "root_path",
+                "type"
+            ]
         },
         "exclude": {
             "type": "array",
             "items": {
                 "type": "string",
+                "minLength": 6,
                 "maxLength": 4096
             }
         },
@@ -71,28 +85,94 @@ schema = {
             "type": "array",
             "items": {
                 "type": "string",
+                "minLength": 6,
                 "maxLength": 4096
             }
+        },
+        "naming": {
+            "type": "object",
+            "properties": {
+                "codename": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 20
+                },
+                "log_file": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 255
+                }
+            },
+            "additionalProperties": False,
+            "required": [
+                "codename",
+                "log_file"
+            ]
+        },
+        "notify": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "minLength": 11,
+                "maxLength": 4096
+            }
+        },
+        "permissions": {
+            "type": "object",
+            "properties": {
+                "primary": {
+                    "type": "object",
+                    "properties": {
+                        "gid": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 4096
+                        },
+                        "mode": {
+                            "type": "string",
+                            "pattern": "^0o[0-7]{4}$"
+                        },
+                        "uid": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 4096
+                        }
+                    },
+                    "additionalProperties": False,
+                    "required": ["mode"]
+                }
+            },
+            "additionalProperties": False,
+            "required": ["primary"]
+        },
+        "resources": {
+            "type": "object",
+            "properties": {
+                "thread_count": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 500
+                }
+            },
+            "additionalProperties": False,
+            "required": ["thread_count"]
+        },
+        "workdir": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 4096
         }
     },
     "additionalProperties": False,
     "required": [
-        "containers_sata_device_path",
-        "containers_sata_mount_path",
-        "destination_type",
-        "destination_root_path",
-        "destination_endpoint",
-        "destination_limits_critical",
-        "destination_limits_warning",
-        "permissions_primary_uid",
-        "permissions_primary_gid",
-        "permissions_primary_mode",
-        "resources_thread_count",
-        "workdir",
-        "naming_log_file",
-        "naming_codename",
-        "notify",
+        "containers",
+        "destination",
         "exclude",
-        "include"
+        "include",
+        "naming",
+        "notify",
+        "permissions",
+        "resources",
+        "workdir",
     ]
 }
