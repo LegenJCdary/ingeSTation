@@ -4,7 +4,8 @@ from typing import Union
 
 from jsonschema import validate, ValidationError
 
-from ingestation.modules.configs.schemas import application, project, operator
+from ingestation.modules.configs.schemas import application, project, operator, \
+    final as final_schema
 from ingestation.modules.configs.templates import final
 from ingestation.modules.global_vars import APPLICATION_DIR, CONFIG_RULES
 from ingestation.modules.outputs.loggers import Loggers
@@ -103,7 +104,39 @@ class MergedConf:
             "operator": self.merge_conf(self.operator)
         }
 
-        self.final = self.create_merged_conf()
+        self.merged_conf = self.create_merged_conf()
+        self.final = self.create_final_conf()
+
+    @staticmethod
+    def extract_dict_keys(dct):
+        keys = []
+
+        for key, value in dct.items():
+            keys.append(key)
+            if isinstance(value, dict):
+                sub_keys = MergedConf.extract_dict_keys(value)
+                keys.extend(sub_keys)
+
+        return keys
+
+    @staticmethod
+    def replace_str_in_list(lst: list, old_str, new_str):
+        for s in lst:
+            if old_str in s:
+                new_s = str.replace(s, old_str, new_str)
+                lst.remove(s)
+                lst.append(new_s)
+        return lst
+
+    @staticmethod
+    def add_values_to_dict_keys(dct, keys, value):
+        if len(keys) == 1:
+            dct[keys[0]] = value
+        else:
+            key = keys[0]
+            if key not in dct:
+                dct[key] = {}
+            MergedConf.add_values_to_dict_keys(dct[key], keys[1:], value)
 
     def parse_cli_options(self):
         cli = {}
@@ -184,6 +217,29 @@ class MergedConf:
                 merged_conf[key] = value
 
         return merged_conf
+
+    def create_final_conf(self):
+        final_extracted_keys = MergedConf.extract_dict_keys(final.template)
+        final_conf = {}
+        excluded_keys = []
+
+        for key in final_extracted_keys:
+            if "_" in key:
+                excluded_keys.append(key)
+
+        for key, value in self.merged_conf.items():
+            for ex_key in excluded_keys:
+                if ex_key in key:
+                    new_ex_key = str.replace(ex_key, "_", "-")
+                    key = str.replace(key, ex_key, new_ex_key)
+                    break
+            separated_key = str.split(key, "_")
+            separated_key = MergedConf.replace_str_in_list(separated_key, "-", "_")
+            MergedConf.add_values_to_dict_keys(final_conf, separated_key, value)
+
+        validate_json(final_conf, final_schema)
+
+        return final_conf
 
     def apply_exclusive_rule(self, merged_key):
         """
