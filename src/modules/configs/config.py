@@ -103,10 +103,40 @@ class MergedConf:
             "operator": self.merge_conf(self.operator)
         }
 
-        self.final = self.create_final_conf()
+        self.final_merged_conf = self.create_final_merged_conf()
+        self.final = self.unmerge_conf()
 
-    def create_final_conf(self):
-        final_conf = self.merge_conf(final.template)
+    @staticmethod
+    def extract_keys(dct):
+        keys = []
+        for key, value in dct.items():
+            keys.append(key)
+            if isinstance(value, dict):
+                sub_keys = MergedConf.extract_keys(value)
+                keys.extend(sub_keys)
+        return keys
+
+    @staticmethod
+    def replace_str_in_list(lst: list, old_str, new_str):
+        for s in lst:
+            if old_str in s:
+                new_s = str.replace(s, old_str, new_str)
+                lst.remove(s)
+                lst.append(new_s)
+        return lst
+
+    @staticmethod
+    def add_to_dict(dct, keys, value):
+        if len(keys) == 1:
+            dct[keys[0]] = value
+        else:
+            key = keys[0]
+            if key not in dct:
+                dct[key] = {}
+            MergedConf.add_to_dict(dct[key], keys[1:], value)
+
+    def create_final_merged_conf(self):
+        final_merged_conf = self.merge_conf(final.template)
         rule_mode = ("exclusive", "inclusive", "priority")
         rule_order = ("application", "project", "operator", "cli")
 
@@ -141,11 +171,9 @@ class MergedConf:
                         f"Invalid order ({odr}) in key ({key}) is defined. "
                         f"Rule order must be one of {rule_order}. Update CONFIG_RULES."
                     )
-            final_conf[key] = self.get_final_value(key)
+            final_merged_conf[key] = self.get_final_value(key)
 
-        validate_json(final_conf, final_schema)
-
-        return final_conf
+        return final_merged_conf
 
     def get_final_value(self, merged_key):
         value = self.apply_config_rule(merged_key)
@@ -176,6 +204,30 @@ class MergedConf:
                 merged_conf[key] = value
 
         return merged_conf
+
+    def unmerge_conf(self):
+        final_template = final.template
+        final_extracted_keys = MergedConf.extract_keys(final_template)
+
+        unmerged_conf = {}
+        excluded_keys = []
+        for key in final_extracted_keys:
+            if "_" in key:
+                excluded_keys.append(key)
+
+        for key, value in self.final_merged_conf.items():
+            for ex_key in excluded_keys:
+                if ex_key in key:
+                    new_ex_key = str.replace(ex_key, "_", "-")
+                    key = str.replace(key, ex_key, new_ex_key)
+                    break
+            sep_key = str.split(key, "_")
+            sep_key = MergedConf.replace_str_in_list(sep_key, "-", "_")
+            MergedConf.add_to_dict(unmerged_conf, sep_key, value)
+
+        validate_json(unmerged_conf, final_schema)
+
+        return unmerged_conf
 
     def apply_exclusive_rule(self, merged_key):
         """
