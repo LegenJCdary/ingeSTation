@@ -100,6 +100,7 @@ NONINFRINGEMENT
 noqa
 nosec
 optparse
+OSError
 OSI
 overgeneral
 param
