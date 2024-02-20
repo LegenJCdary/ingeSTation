@@ -14,7 +14,8 @@ class CliInput:
         "debug": ["--debug", "-d"],
         "exclude": ["--exclude", "-e"],
         "include": ["--include", "-i"],
-        "verification": ["--no-verification", "-n"]
+        "verification": ["--no-verification", "-n"],
+        "notification": ["--no-notification", "-m"]
     }
 
     short_args = "".join([short[1].strip("-") for short in option_names.values()])
@@ -38,6 +39,9 @@ class CliInput:
         parser.add_argument(self.option_names["verification"][0], self.option_names["verification"]
                             [1], action="store_false", default=True, dest="verification", help=
                             "Skip verification step performed after data ingest.")
+        parser.add_argument(self.option_names["notification"][0], self.option_names["notification"]
+                            [1], action="store_false", default=True, dest="notification", help=
+                            "Skip notification step performed after data ingest.")
 
         return parser
 
@@ -51,7 +55,8 @@ class CliInput:
             "debug": arguments.debug,
             "exclude": exclude_list,
             "include": include_list,
-            "verification": arguments.verification
+            "verification": arguments.verification,
+            "notification": arguments.notification
         }
 
     def validate_inex_lists(self, exclude: list, include: list) -> Tuple:
