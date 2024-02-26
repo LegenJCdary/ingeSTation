@@ -14,6 +14,7 @@ asdict
 async
 attr
 attrs
+auth
 BaseException
 baz
 bool
@@ -89,6 +90,7 @@ init
 InitParams
 inlinevar
 isinstance
+isfile
 isort
 ixin
 json
@@ -152,6 +154,7 @@ Pylint
 pytest
 Pytest
 pyTesting
+readlines
 README
 regexes
 rgx
@@ -161,7 +164,12 @@ runtime
 sata
 sda
 sed
+sendmail
 setuptools
+smtp
+SMTP
+SMTPException
+smtplib
 src
 startswith
 staticmethod
@@ -172,6 +180,7 @@ StreamHandler
 sublicense
 subtree
 sudo
+SVSVFEOTDIQQXHZC
 swp
 sys
 tata
@@ -180,6 +189,7 @@ TestArgumentParsingInExLists
 TestArgumentParsingVerification
 TestConf
 TestMergedConf
+TestNotify
 tmp
 TODO
 truthy
@@ -210,4 +220,5 @@ yml
 YZ
 zA
 Zhou
+zmail
 ZZ
