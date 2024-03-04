@@ -157,10 +157,32 @@ schema = {
             "additionalProperties": False,
             "required": ["thread_count"]
         },
+        "smtp": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "minLength": 15
+                },
+                "server": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "minLength": 11
+                },
+                "user": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "minLength": 3
+                }
+            },
+            "additionalProperties": False,
+            "required": ["server"]
+        },
         "workdir": {
             "type": "string",
-            "minLength": 2,
-            "maxLength": 4096
+            "maxLength": 4096,
+            "minLength": 2
         }
     },
     "additionalProperties": False,
@@ -173,6 +195,7 @@ schema = {
         "notify",
         "permissions",
         "resources",
-        "workdir",
+        "smtp",
+        "workdir"
     ]
 }

@@ -23,5 +23,10 @@
   "include": [
     "S4WWNJ0N420419V",
     "S4WWNJ0N420420V"
-  ]
+  ],
+  "smtp": {
+    "server": "smtp.163.com",
+    "user": "13255193362@163.com",
+    "password": "SVSVFEOTDIQQXHZC"
+  }
 } 

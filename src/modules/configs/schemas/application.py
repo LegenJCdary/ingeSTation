@@ -35,15 +35,6 @@ schema = {
         "destination": {
             "type": "object",
             "properties": {
-                "type": {
-                    "type": "string",
-                    "maxLength": 4096,
-                    "minLength": 2
-                },
-                "root_path": {
-                    "type": "string",
-                    "maxLength": 4096
-                },
                 "endpoint": {
                     "type": "string",
                     "maxLength": 4096
@@ -62,15 +53,64 @@ schema = {
                     },
                     "additionalProperties": False,
                     "required": ["critical"]
+                },
+                "root_path": {
+                    "type": "string",
+                    "maxLength": 4096
+                },
+                "type": {
+                    "type": "string",
+                    "maxLength": 4096,
+                    "minLength": 2
                 }
             },
             "additionalProperties": False,
             "required": [
-                "type",
-                "root_path",
                 "endpoint",
-                "limits"
+                "limits",
+                "root_path",
+                "type"
             ]
+        },
+        "exclude": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "maxLength": 4096,
+                "minLength": 6
+            }
+        },
+        "include": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "maxLength": 4096,
+                "minLength": 6
+            }
+        },
+        "naming": {
+            "type": "object",
+            "properties": {
+                "codename": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 3
+                },
+                "log_file": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "additionalProperties": False,
+            "required": []
+        },
+        "notify": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "maxLength": 4096,
+                "minLength": 11
+            }
         },
         "permissions": {
             "type": "object",
@@ -78,15 +118,15 @@ schema = {
                 "primary": {
                     "type": "object",
                     "properties": {
-                        "uid": {
-                            "type": "integer"
-                        },
                         "gid": {
                             "type": "integer"
                         },
                         "mode": {
                             "type": "string",
                             "pattern": "^0o[0-7]{4}$"
+                        },
+                        "uid": {
+                            "type": "integer"
                         }
                     },
                     "additionalProperties": False,
@@ -106,49 +146,32 @@ schema = {
             "additionalProperties": False,
             "required": ["thread_count"]
         },
-        "workdir": {
-            "type": "string",
-            "maxLength": 4096
-        },
-        "naming": {
+        "smtp": {
             "type": "object",
             "properties": {
-                "log_file": {
+                "password": {
                     "type": "string",
-                    "maxLength": 255
+                    "maxLength": 255,
+                    "minLength": 15
                 },
-                "codename": {
+                "server": {
                     "type": "string",
-                    "maxLength": 20,
+                    "maxLength": 255,
+                    "minLength": 11
+                },
+                "user": {
+                    "type": "string",
+                    "maxLength": 255,
                     "minLength": 3
                 }
             },
             "additionalProperties": False,
-            "required": []
+            "required": ["server"]
         },
-        "notify": {
-            "type": "array",
-            "items": {
-                "type": "string",
-                "maxLength": 4096,
-                "minLength": 11
-            }
-        },
-        "exclude": {
-            "type": "array",
-            "items": {
-                "type": "string",
-                "maxLength": 4096,
-                "minLength": 6
-            }
-        },
-        "include": {
-            "type": "array",
-            "items": {
-                "type": "string",
-                "maxLength": 4096,
-                "minLength": 6
-            }
+        "workdir": {
+            "type": "string",
+            "maxLength": 4096,
+            "minLength": 2
         }
     },
     "additionalProperties": False,

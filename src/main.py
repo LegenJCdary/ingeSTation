@@ -1,6 +1,6 @@
 from ingestation.modules.configs.config import MergedConf
 from ingestation.modules.misc.arguments import CliInput
-from ingestation.modules.misc.utils import InitParams
+from ingestation.modules.misc.utils import InitParams, Notify
 from ingestation.modules.outputs import blocks
 from ingestation.modules.outputs.loggers import Loggers
 
@@ -14,6 +14,10 @@ def main(cli_options: dict) -> None:
 
     config = MergedConf(logger, cli_options)
     logger.debug(config.final)
+
+    if cli_options["notification"]:
+        notify = Notify(config.final["notify"], loggers)
+        notify.send_notifications(config.final["smtp"], "mail content")
 
 
 def ingestation():
